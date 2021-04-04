@@ -18,7 +18,7 @@ will release code and models.
 
 ## Notes:
 * Currently the implementation only includes Model-3.
-* For Model-2, refer to [@rishikksh20]: https://github.com/rishikksh20/ViViT-pytorch
+* For Model-2, refer to the repo: https://github.com/rishikksh20/ViViT-pytorch by [@rishikksh20](https://github.com/rishikksh20): 
 
 
 ## Usage
