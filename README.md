@@ -19,6 +19,7 @@ will release code and models.
 
 ## Notes:
 * Currently the implementation only includes Model-3.
+* Embedding technique: Tubelet embedding
 * For Model-2, refer to the repo: https://github.com/rishikksh20/ViViT-pytorch by [@rishikksh20](https://github.com/rishikksh20): 
 
 
