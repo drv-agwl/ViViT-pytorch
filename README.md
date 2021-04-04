@@ -48,6 +48,10 @@ device = torch.device('cpu')
 vid = torch.rand(32, 3, 32, 64, 64).to(device)
 
 pred = v(vid)  # (32, 10)
+
+parameters = filter(lambda p: p.requires_grad, v.parameters())
+parameters = sum([np.prod(p.size()) for p in parameters]) / 1_000_000
+print('Trainable Parameters: %.3fM' % parameters)
 ```
 
 ## Citation:
