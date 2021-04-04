@@ -2,7 +2,8 @@
 
 ## ViViT: A Video Vision Transformer - Pytorch
 
-Implementation of <a href="https://arxiv.org/pdf/2103.15691v1.pdf">ViViT</a>.
+An unofficial implementation of <a href="https://arxiv.org/pdf/2103.15691v1.pdf">ViViT</a>.
+
 We present pure-transformer based models for video
 classification, drawing upon the recent success of such models in image classification. Our model extracts spatiotemporal tokens from the input video, which are then encoded by a series of transformer layers. In order to handle the long sequences of tokens encountered in video, we
 propose several, efficient variants of our model which factorise the spatial- and temporal-dimensions of the input. Although transformer-based models are known to only be effective when large training datasets are available, we show
