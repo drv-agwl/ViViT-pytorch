@@ -1,4 +1,4 @@
-<img src="./images/arch.png" width="500px"></img>
+<img src="./images/arch.png"></img>
 
 ## ViViT: A Video Vision Transformer - Pytorch
 
