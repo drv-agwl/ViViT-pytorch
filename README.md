@@ -62,4 +62,4 @@ pred = v(vid)  # (32, 10)
 ```
 
 ## Acknowledgement:
-* Code implementation is inspired from [@lucidrains](https://github.com/lucidrains) repo : https://github.com/lucidrains/vit-pytorch
+* Code implementation is inspired from [@lucidrains](https://github.com/lucidrains), repo : https://github.com/lucidrains/vit-pytorch
