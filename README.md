@@ -16,6 +16,11 @@ convolutional networks. To facilitate further research, we
 will release code and models.
 
 
+## Notes:
+* Currently the implementation only includes Model-3.
+* For Model-2, refer to [@rishikksh20]: https://github.com/rishikksh20/ViViT-pytorch
+
+
 ## Usage
 
 ```python
