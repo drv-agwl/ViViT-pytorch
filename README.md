@@ -67,4 +67,4 @@ print('Trainable Parameters: %.3fM' % parameters)
 ```
 
 ## Acknowledgement:
-* Code implementation is inspired from [@lucidrains](https://github.com/lucidrains), repo : https://github.com/lucidrains/vit-pytorch
+* Code implementation is derived from [@lucidrains](https://github.com/lucidrains), repo : https://github.com/lucidrains/vit-pytorch
