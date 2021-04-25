@@ -11,7 +11,7 @@ class PreNorm(nn.Module):
         self.fn = fn
 
     def forward(self, x, **kwargs):
-        return self.fn(x, **kwargs)
+        return self.fn(self.norm(x), **kwargs)
 
 
 class FSAttention(nn.Module):
