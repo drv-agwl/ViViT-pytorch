@@ -84,16 +84,19 @@ class FDAttention(nn.Module):
         ks, vs = ks.view(b, h // 2, self.nt, self.nh * self.nw, -1), vs.view(b, h // 2, self.nt, self.nh * self.nw, -1)
         spatial_dots = einsum('b h t i d, b h t j d -> b h t i j', qs, ks) * self.scale
         sp_attn = self.attend(spatial_dots)
-        spatial_out = einsum('b h t i j, b h t j d -> b h t i d', sp_attn, vs)
+        spatial_out = einsum('b h t i j, b h t j d -> b h t i d', sp_attn, vs).flatten(start_dim=2, end_dim=3)
 
         # Attention over temporal dimension
         qt = qt.view(b, h // 2, self.nh * self.nw, self.nt, -1)
         kt, vt = kt.view(b, h // 2, self.nh * self.nw, self.nt, -1), vt.view(b, h // 2, self.nh * self.nw, self.nt, -1)
         temporal_dots = einsum('b h s i d, b h s j d -> b h s i j', qt, kt) * self.scale
         temporal_attn = self.attend(temporal_dots)
-        temporal_out = einsum('b h s i j, b h s j d -> b h s i d', temporal_attn, vt)
-
-        # return self.to_out(out)
+        temporal_out = einsum('b h s i j, b h s j d -> b h s i d', temporal_attn, vt).flatten(start_dim=2, end_dim=3)
+        
+        out = torch.cat((spatial_out, temporal_out), dim=1)
+        out = rearrange(out, 'b h n d -> b n (h d)')
+        
+        return self.to_out(out)
 
 
 class FeedForward(nn.Module):
@@ -171,21 +174,23 @@ class FDATransformerEncoder(nn.Module):
         self.nw = nw
 
         for _ in range(depth):
-            self.layers.append(
-                PreNorm(dim, FDAttention(dim, nt, nh, nw, heads=heads, dim_head=dim_head, dropout=dropout)))
-
+            self.layers.append(nn.ModuleList(
+                [PreNorm(dim, FDAttention(dim, nt, nh, nw, heads=heads, dim_head=dim_head, dropout=dropout)),
+                 PreNorm(dim, FeedForward(dim, mlp_dim, dropout=dropout))
+                 ]))
+         
     def forward(self, x):
-        for attn in self.layers:
+        for attn, ff in self.layers:
             x = attn(x) + x
-
+            x = ff(x) + x
         return x
 
 
 class ViViTBackbone(nn.Module):
     """ Model-3 backbone of ViViT """
 
-    def __init__(self, t, h, w, patch_t, patch_h, patch_w, num_classes, dim, depth, heads, mlp_dim, dim_head=3,
-                 channels=3, mode='tubelet', device='cuda', emb_dropout=0., dropout=0., model=3):
+    def __init__(self, t, h, w, patch_t, patch_h, patch_w, num_classes, dim, depth, heads, mlp_dim, dim_head=64,
+                 channels=3, mode='tubelet', device='cuda', emb_dropout=0., dropout=0., model=4):
         super().__init__()
 
         assert t % patch_t == 0 and h % patch_h == 0 and w % patch_w == 0, "Video dimensions should be divisible by " \
@@ -199,6 +204,7 @@ class ViViTBackbone(nn.Module):
         self.h = patch_h
         self.w = patch_w
         self.mode = mode
+        self.model = model
         self.device = device
 
         self.nt = self.T // self.t
@@ -235,11 +241,12 @@ class ViViTBackbone(nn.Module):
     def forward(self, x):
         """ x is a video: (b, C, T, H, W) """
 
-        tokens = self.to_tubelet_embedding(x)
+        tokens = self.to_tubelet_embedding(x)					# tokens.shape: (b, nt, nh*nw, d)
 
         tokens += self.pos_embedding
         tokens = self.dropout(tokens)
-
+        if self.model == 4:
+            tokens = rearrange(tokens, 'b t s d -> b (t s) d')	# tokens.shape: (b, nt*nh*nw, d)
         x = self.transformer(tokens)
         x = x.mean(dim=1)
 
@@ -251,6 +258,11 @@ if __name__ == '__main__':
     device = torch.device('cpu')
     x = torch.rand(32, 3, 32, 64, 64).to(device)
 
-    vivit = ViViTBackbone(32, 64, 64, 8, 4, 4, 10, 512, 6, 10, 8, model=3).to(device)
-    out = vivit(x)
-    print(out)
+    ViViTModel3 = ViViTBackbone(t=32, h=64, w=64, patch_t=8, patch_h=4, patch_w=4, num_classes=10, dim=512,
+          depth=6, heads=8, mlp_dim=8, model=3, device='cpu').to(device)
+    ViViTModel4 = ViViTBackbone(t=32, h=64, w=64, patch_t=8, patch_h=4, patch_w=4, num_classes=10, dim=512,
+                          depth=6, heads=8, mlp_dim=8, model=4, device='cpu').to(device)
+    out_3 = ViViTModel3(x)
+    out_4 = ViViTModel4(x)
+    print(out_3.shape)
+    print(out_4.shape)

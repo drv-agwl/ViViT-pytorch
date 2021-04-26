@@ -4,6 +4,7 @@
 
 An unofficial implementation of <a href="https://arxiv.org/pdf/2103.15691v1.pdf">ViViT</a>.
 
+### Abstract 
 We present pure-transformer based models for video
 classification, drawing upon the recent success of such models in image classification. Our model extracts spatiotemporal tokens from the input video, which are then encoded by a series of transformer layers. In order to handle the long sequences of tokens encountered in video, we
 propose several, efficient variants of our model which factorise the spatial- and temporal-dimensions of the input. Although transformer-based models are known to only be effective when large training datasets are available, we show
@@ -18,9 +19,9 @@ will release code and models.
 
 
 ## Notes:
-* Currently the implementation only includes Model-3.
+* The implementation now includes both Model-3 and Model-4.
 * Embedding technique: Tubelet embedding
-* For Model-2, refer to the repo: https://github.com/rishikksh20/ViViT-pytorch by [@rishikksh20](https://github.com/rishikksh20): 
+* For Model-2, refer to the repo: https://github.com/rishikksh20/ViViT-pytorch by [@rishikksh20](https://github.com/rishikksh20).
 
 
 ## Usage
@@ -41,7 +42,7 @@ v = ViViTBackbone(
     depth=6,
     heads=10,
     mlp_dim=8,
-    model=3
+    model=3            # or 4
 )
 
 device = torch.device('cpu')
